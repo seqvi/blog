@@ -2,3 +2,6 @@
 /secrets
 .idea/
 obj/
+bin/
+*.pem
+/.vs/

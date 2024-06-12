@@ -19,25 +19,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
     ports:
       - "5050:80"
-    restart: always  
-    
-  authelia:
-    container_name: 'authelia'
-    image: 'docker.io/authelia/authelia:latest'
-    #restart: 'unless-stopped'
-    networks:
-      net:
-        aliases: [ ]
-    expose:
-      - 9091
-    secrets: [ 'JWT_SECRET', 'SESSION_SECRET', 'STORAGE_PASSWORD', 'STORAGE_ENCRYPTION_KEY' ]
-    environment:
-      AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: '/run/secrets/JWT_SECRET'
-      AUTHELIA_SESSION_SECRET_FILE: '/run/secrets/SESSION_SECRET'
-      AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: '/run/secrets/STORAGE_PASSWORD'
-      AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/run/secrets/STORAGE_ENCRYPTION_KEY'
-    volumes:
-      - '${PWD}/configs/authelia-config:/config'    
+    restart: always
 
 # the observability staff  
   aspire-dashboard:
@@ -46,18 +28,3 @@ services:
     ports:
       - "18888:18888"
       - "4317:18889"
-
-secrets:
-  JWT_SECRET:
-    file: '${PWD}/secrets/JWT_SECRET'
-  SESSION_SECRET:
-    file: '${PWD}/secrets/SESSION_SECRET'
-  STORAGE_PASSWORD:
-    file: '${PWD}/secrets/STORAGE_PASSWORD'
-  STORAGE_ENCRYPTION_KEY:
-    file: '${PWD}/secrets/STORAGE_ENCRYPTION_KEY'
-    
-networks:
-  net:
-    external: true
-    name: 'net'
