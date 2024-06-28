@@ -1,0 +1,8 @@
+﻿users:
+  admin:
+    password: {{ADMIN_PASSWORD}}
+    displayname: "Main admin"
+    email: "admin@example.com"
+    groups:
+      - admin
+      - root

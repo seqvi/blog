@@ -1,0 +1,29 @@
+﻿identity_validation:
+  reset_password:
+    jwt_secret: {{JWT_SECRET}}
+
+session:
+  secret: {{SESSION_SECRET}}
+  cookies:
+    - domain: '127.0.0.1'
+      authelia_url: 'https://127.0.0.1/authelia'
+      
+authentication_backend:
+  file:
+    path: '/config/users_database.yml'
+    
+storage:
+  encryption_key: {{ENCRYPTION_KEY}}
+  local:
+    path: '/config/db.sqlite3'
+    
+notifier:
+  disable_startup_check: false
+  filesystem:
+    filename: '/config/notification.log'
+    
+access_control:
+  default_policy: deny
+  rules:
+    - domain: localhost
+      policy: one_factor

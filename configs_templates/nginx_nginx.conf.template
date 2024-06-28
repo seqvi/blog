@@ -1,0 +1,34 @@
+﻿error_log  /var/log/nginx.error_log  info;
+http {
+    include       conf/mime.types;
+    default_type  application/octet-stream;
+    server {
+        listen 80;
+        server_name localhost 127.0.0.1;
+        
+        root /usr/share/nginx/html
+        index index.html
+        
+        location / {
+                try_files $uri $uri/ =404;
+            }
+        location ~* \.(html|css|js)$ {
+                try_files $uri =404;
+            }
+            
+        location /unsecure {
+            proxy_pass http://localhost:5000;
+        }
+
+        location /secure {
+            auth_request /authelia/api/verify?rd=$scheme://$http_host$request_uri;
+            error_page 401 =302 /authelia/api/401?rd=$scheme://$http_host$request_uri;
+            proxy_pass http://localhost:5002;
+        }
+
+        location /authelia/ {
+            internal;
+            proxy_pass http://localhost:9091/;
+        }
+    }
+}

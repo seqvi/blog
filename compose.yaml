@@ -1,30 +1,46 @@
 services:
+  
   postgres:
-    container_name: postgres
-    image: postgres:latest
-    secrets: ['POSTGRES_PW']
+    image: postgres
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_DB=${POSTGRES_DB} #optional (specify default database instead of $POSTGRES_DB)
-      - POSTGRES_PASSWORD_FILE='/run/secrets/STORAGE_PASSWORD'
-    ports:
-      - "5432:5432"
-    restart: always
+      - POSTGRES_DB={$PROJECT_DB}
+      - POSTGRES_USER={$DB_USER}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+ #   volumes:
+ #     - .data:/var/lib/postgresql/data:"rw"
+    secrets:
+      - db_password
 
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4:latest
+  authelia:
+    image: authelia/authelia
+    ports:
+      - 9091
+      - 9092
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
-    ports:
-      - "5050:80"
-    restart: always
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE:/run/secrets/encryption_key
+    volumes:
+      - ./.configs/authelia:/config
+    secrets:
+      - db_password
+      - encryption_key
+    depends_on:
+      - postgres
 
-# the observability staff  
-  aspire-dashboard:
-    container_name: aspire-dashboard
-    image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard
+  nginx:
+    image: nginx
+    volumes:
+      - ./.configs/nginx/nginx.conf:/etc/nginx/default.conf
+      - ./wwwroot:/usr/share/nginx/html
+      - .data/logs/:/var/log/nginx/:rw
     ports:
-      - "18888:18888"
-      - "4317:18889"
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - authelia
+
+secrets:
+  db_password:
+    file: ./.secrets/db_password
+  encryption_key:
+    file: ./.secrets/encryption_key
+  
