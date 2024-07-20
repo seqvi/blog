@@ -53,4 +53,4 @@ mkdir -p $data_directory
 #
 echo -e "$R CLEAR PASSWORD FOR ADMIN:$NC"
 echo -e "$G $ADMIN_PASSWORD_CLEAR $NC"
-echo -e "$R IT CAN BO SHOWN ONLY ONCE!$NC"
+echo -e "$R IT CAN BE SHOWN ONLY ONCE!$NC"
