@@ -1,4 +1,4 @@
-﻿using blogctl;
+using blogctl;
 using Cocona;
 
 var app = CoconaApp.Create();
