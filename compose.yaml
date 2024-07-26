@@ -14,12 +14,13 @@ services:
   authelia:
     image: authelia/authelia
     ports:
-      - 9091
-      - 9092
+      - "9091:9091"
+      - "9092:9092"
     environment:
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE:/run/secrets/encryption_key
     volumes:
       - ./.configs/authelia:/config
+      - .data/authelia:/var/data
     secrets:
       - db_password
       - encryption_key

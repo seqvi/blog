@@ -1,0 +1,10 @@
+  services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./.configs/nginx/nginx.conf:/etc/nginx/default.conf
+      - ./wwwroot:/usr/share/nginx/html
+      - .data/logs/:/var/log/nginx/:rw
+    ports:
+      - "80:80"
+      - "443:443"

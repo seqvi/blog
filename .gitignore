@@ -1,9 +1,8 @@
-/secrets
 .idea/
 obj/
 bin/
 *.pem
-/.vs/
-/.secrets/
-/.configs/
+.vs/
+.secrets/
+.configs/
 .data/
