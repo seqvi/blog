@@ -30,12 +30,16 @@ services:
   nginx:
     image: nginx
     volumes:
-      - ./.configs/nginx/nginx.conf:/etc/nginx/default.conf
+      - ./.configs/nginx/:/etc/nginx/conf.d
       - ./wwwroot:/usr/share/nginx/html
       - .data/logs/:/var/log/nginx/:rw
     ports:
       - "80:80"
       - "443:443"
+    secrets:
+      - nginx_cert
+      - nginx_cert_key
+      - dhparam
     depends_on:
       - authelia
 
@@ -44,4 +48,10 @@ secrets:
     file: ./.secrets/db_password
   encryption_key:
     file: ./.secrets/encryption_key
-  
+    
+  nginx_cert:
+    file: .secrets/nginx/nginx-selfsigned.crt
+  nginx_cert_key:
+    file: .secrets/nginx/nginx-selfsigned.key
+  dhparam:
+    file: .secrets/nginx/dhparam.pem

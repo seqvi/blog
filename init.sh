@@ -38,13 +38,19 @@ EOF
 #Populate configs with secrets
 rm -rf $configs_directory
 mkdir -p "$configs_directory"
-mkdir -p "$configs_directory/nginx/"
-cp configs_templates/nginx_nginx.conf.template $configs_directory/nginx/nginx.conf
+
+#authelia
 mkdir -p "$configs_directory/authelia"
 sed -e "s|{{SESSION_SECRET}}|$SESSION_SECRET|g" -e "s|{{JWT_SECRET}}|$JWT_SECRET|g" -e "s|{{ENCRYPTION_KEY}}|$ENCRYPTION_KEY|g" configs_templates/authelia_config.yml.template > .configs/authelia/configuration.yml
-
 sed "s|{{ADMIN_PASSWORD}}|$ADMIN_PASSWORD|g" configs_templates/authelia_users_database.yml.template > $configs_directory/authelia/users_database.yml
 
+#nginx
+mkdir -p "$configs_directory/nginx/"
+  # produce new TLS cert and key for https connections
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $secrets/nginx/nginx-selfsigned.key -out $secrets/nginx/nginx-selfsigned.crt -subj $subj
+openssl dhparam -out $secrets/nginx/dhparam.pem 4096
+  # produce configs from templates
+cp configs_templates/nginx/* $configs_directory/nginx
 
 #clear data_directory
 rm -rf $data_directory
@@ -54,3 +60,4 @@ mkdir -p $data_directory
 echo -e "$R CLEAR PASSWORD FOR ADMIN:$NC"
 echo -e "$G $ADMIN_PASSWORD_CLEAR $NC"
 echo -e "$R IT CAN BE SHOWN ONLY ONCE!$NC"
+
