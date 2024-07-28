@@ -1,6 +1,7 @@
 services:
   
   postgres:
+    container_name: postgres
     image: postgres
     environment:
       - POSTGRES_DB={$PROJECT_DB}
@@ -10,12 +11,15 @@ services:
  #     - .data:/var/lib/postgresql/data:"rw"
     secrets:
       - db_password
+    networks:
+      net:
+        aliases: [ ]
 
   authelia:
+    container_name: authelia
     image: authelia/authelia
-    ports:
-      - "9091:9091"
-      - "9092:9092"
+    expose:
+      - 9091
     environment:
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE:/run/secrets/encryption_key
     volumes:
@@ -26,8 +30,12 @@ services:
       - encryption_key
     depends_on:
       - postgres
+    networks:
+      net:
+        aliases: [ ]
 
   nginx:
+    container_name: nginx
     image: nginx
     volumes:
       - ./.configs/nginx/:/etc/nginx/conf.d
@@ -40,9 +48,21 @@ services:
       - nginx_cert
       - nginx_cert_key
       - dhparam
+    networks:
+      net:
+        aliases: [ ]
     depends_on:
       - authelia
-
+        
+  whoami:
+    container_name: whoami
+    image: docker.io/traefik/whoami
+    expose:
+      - 80
+    networks:
+      net:
+        aliases: [ ]
+        
 secrets:
   db_password:
     file: ./.secrets/db_password
@@ -55,3 +75,7 @@ secrets:
     file: .secrets/nginx/nginx-selfsigned.key
   dhparam:
     file: .secrets/nginx/dhparam.pem
+    
+networks:
+  net:
+    driver: bridge

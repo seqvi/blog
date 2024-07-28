@@ -17,7 +17,8 @@ ENCRYPTION_KEY="$(openssl rand -base64 42)"
 SESSION_SECRET="$(openssl rand -base64 32)"
 ADMIN_PASSWORD_CLEAR="$(openssl rand -base64 12)"
 SALT=$(openssl rand -base64 12)
-ADMIN_PASSWORD="$(echo "$ADMIN_PASSWORD_CLEAR" | argon2 $SALT -id -t 2 -m 16 -p 4 -e)"
+ADMIN_PASSWORD="$(echo "$ADMIN_PASSWORD_CLEAR" | argon2 $SALT -id -t 2 -m 32 -p 4 -e)"
+#docker run authelia/authelia:latest authelia crypto hash generate argon2 --profile low-memory --password xxx
 #Create secrets_directory
 mkdir -p "$secrets_directory"
 echo "$PG_PASSWD" > $secrets_directory/db_password
@@ -53,6 +54,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $secrets_directory/n
 openssl dhparam -out $secrets_directory/nginx/dhparam.pem 4096
   # produce configs from templates
 cp configs_templates/nginx/* $configs_directory/nginx
+cp -r configs_templates/nginx/snippets $configs_directory/nginx
 
 #clear data_directory
 rm -rf $data_directory

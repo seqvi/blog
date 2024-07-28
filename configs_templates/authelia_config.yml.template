@@ -3,27 +3,66 @@ identity_validation:
     jwt_secret: {{JWT_SECRET}}
 
 session:
+  name: authelia_session
   secret: {{SESSION_SECRET}}
   cookies:
-    - domain: '127.0.0.1'
-      authelia_url: 'https://127.0.0.1/authelia'
+    - domain: 'localhost.local'
+      authelia_url: 'https://auth.localhost.local'
+      default_redirection_url: 'https://localhost.local'
+      
+      #    - domain: 'secure.localhost.local'
+      #      authelia_url: 'https://auth.localhost.local'
+      #      default_redirection_url: 'https://secure.localhost.local'
+      #      
+      #    - domain: 'whoami.localhost.local'
+      #      authelia_url: 'https://auth.localhost.local'
+      #      default_redirection_url: 'https://whoami.localhost.local'
       
 authentication_backend:
+  disable_reset_password: false
   file:
     path: '/config/users_database.yml'
     
 storage:
   encryption_key: {{ENCRYPTION_KEY}}
   local:
-    path: '/config/db.sqlite3'
+    path: '/var/data/db.sqlite3'
     
 notifier:
   disable_startup_check: false
   filesystem:
-    filename: '/config/notification.log'
+    filename: '/var/data/notification.log'
     
 access_control:
   default_policy: deny
   rules:
-    - domain: localhost
+    - domain: '*.localhost.local'
       policy: one_factor
+      subject:
+        - [ 'user:admin' ]
+        - [ 'group:admin' ]
+        
+    - domain: secure.localhost.local
+      policy: one_factor
+      subject:
+        - [ 'user:admin' ]
+        - [ 'group:admin' ]
+        
+    - domain: whoami.localhost.local
+      policy: one_factor
+      subject:
+        - [ 'user:admin' ]
+        - [ 'group:admin' ]
+      
+webauthn:
+  disable: false
+  display_name: Authelia
+  attestation_conveyance_preference: indirect
+  user_verification: preferred
+  timeout: 60s
+
+server:
+  endpoints:
+    authz:
+      auth-request:
+        implementation: 'AuthRequest'
