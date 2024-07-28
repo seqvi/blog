@@ -23,3 +23,6 @@ openssl dhparam -out $secrets/nginx/dhparam.pem 4096
 # produce configs from templates
 
 cp templates/nginx/* .configs/nginx
+
+echo "YOU NEED TO ADD RECORD TO YOUR HOSTS FILE MANUALLY!!!"
+echo "127.0.0.1 localhost.local www.localhost.local seqvi.local"
