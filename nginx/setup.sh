@@ -18,3 +18,8 @@ mkdir -p $secrets/nginx
 
 # produce new TLS cert and key for https connections
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $secrets/nginx/nginx-selfsigned.key -out $secrets/nginx/nginx-selfsigned.crt -subj $subj
+openssl dhparam -out $secrets/nginx/dhparam.pem 4096
+
+# produce configs from templates
+
+cp templates/nginx/* .configs/nginx
