@@ -45,10 +45,12 @@ sed -e "s|{{SESSION_SECRET}}|$SESSION_SECRET|g" -e "s|{{JWT_SECRET}}|$JWT_SECRET
 sed "s|{{ADMIN_PASSWORD}}|$ADMIN_PASSWORD|g" configs_templates/authelia_users_database.yml.template > $configs_directory/authelia/users_database.yml
 
 #nginx
+subj='/C=RU/ST=None/L=None/O=seqvi/CN=localhost.local'
 mkdir -p "$configs_directory/nginx/"
+mkdir -p "$secrets_directory/nginx/"
   # produce new TLS cert and key for https connections
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $secrets/nginx/nginx-selfsigned.key -out $secrets/nginx/nginx-selfsigned.crt -subj $subj
-openssl dhparam -out $secrets/nginx/dhparam.pem 4096
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $secrets_directory/nginx/nginx-selfsigned.key -out $secrets_directory/nginx/nginx-selfsigned.crt -subj $subj
+openssl dhparam -out $secrets_directory/nginx/dhparam.pem 4096
   # produce configs from templates
 cp configs_templates/nginx/* $configs_directory/nginx
 
