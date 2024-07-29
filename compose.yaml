@@ -1,5 +1,4 @@
 services:
-  
   postgres:
     container_name: postgres
     image: postgres
@@ -11,9 +10,6 @@ services:
  #     - .data:/var/lib/postgresql/data:"rw"
     secrets:
       - db_password
-    networks:
-      net:
-        aliases: [ ]
 
   authelia:
     container_name: authelia
@@ -30,9 +26,6 @@ services:
       - encryption_key
     depends_on:
       - postgres
-    networks:
-      net:
-        aliases: [ ]
 
   nginx:
     container_name: nginx
@@ -48,9 +41,6 @@ services:
       - nginx_cert
       - nginx_cert_key
       - dhparam
-    networks:
-      net:
-        aliases: [ ]
     depends_on:
       - authelia
         
@@ -59,9 +49,6 @@ services:
     image: docker.io/traefik/whoami
     expose:
       - 80
-    networks:
-      net:
-        aliases: [ ]
         
 secrets:
   db_password:
@@ -76,6 +63,3 @@ secrets:
   dhparam:
     file: .secrets/nginx/dhparam.pem
     
-networks:
-  net:
-    driver: bridge
