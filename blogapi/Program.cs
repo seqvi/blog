@@ -1,14 +1,85 @@
+using System.Reflection;
+using Microsoft.AspNetCore.HttpLogging;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var serviceName = Assembly.GetEntryAssembly()?.GetName().Name!;
+
+builder.Logging
+    .AddJsonConsole()
+    .AddOpenTelemetry(x =>
+{
+    x.IncludeScopes = true;
+    x.IncludeFormattedMessage = true;
+    x.ParseStateValues = true;
+    
+    x.SetResourceBuilder(
+            ResourceBuilder.CreateDefault()
+                .AddTelemetrySdk()
+                .AddEnvironmentVariableDetector()
+                .AddContainerDetector()
+                .AddService(serviceName))
+        .AddOtlpExporter()
+        .AddConsoleExporter();
+});
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r =>
+        r.AddTelemetrySdk()
+            .AddEnvironmentVariableDetector()
+            .AddContainerDetector()
+            .AddService(serviceName))
+    .WithLogging(x =>
+    {
+        x.AddOtlpExporter()
+            .AddConsoleExporter();
+    })
+    .WithMetrics(x =>
+    {
+        x.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Hosting")
+            .AddHttpClientInstrumentation()
+            .AddAspNetCoreInstrumentation()
+            .AddOtlpExporter();
+    })
+    .WithTracing(x =>
+    {
+        x.AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddSqlClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation();
+            
+        x.AddOtlpExporter();
+    });
+
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.All;
+    options.CombineLogs = true;
+    options.ResponseHeaders
+        .Add("Token");
+    options.ResponseHeaders
+        .Add("Remote-User");
+    options.MediaTypeOptions.AddText("application/json");
+    options.MediaTypeOptions.AddText("text/plain");
+    
+    options.RequestHeaders.Add("Authorization");
+    options.RequestHeaders.Add("Remote-User");
+    
+});
+
 var app = builder.Build();
+
+app.UseHttpLogging();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 var summaries = new[]
 {
