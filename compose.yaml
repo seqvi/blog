@@ -6,8 +6,10 @@ services:
       - POSTGRES_DB={$PROJECT_DB}
       - POSTGRES_USER={$DB_USER}
       - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
- #   volumes:
- #     - .data:/var/lib/postgresql/data:"rw"
+#    volumes:
+#      - .data/postgres:/var/lib/postgresql/data:"rw"
+    expose: 
+      - 5432
     secrets:
       - db_password
 
@@ -54,6 +56,7 @@ services:
     build:
       context: blogapi
       target: final
+    container_name: blogapi
     expose:
       - 8080
       - 8082
