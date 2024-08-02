@@ -21,9 +21,9 @@ PGADMIN_PW=pg-admin-password
 
 just do `docker compose up -d` and go to http://localhost:5000.
 
-## Разное
+## Misc.
 
-### сгенерить ключ в 64 символа
+### make key - old api
 
 ```bash
   docker run authelia/authelia:latest authelia crypto rand --length 64 --charset alphanumeric
