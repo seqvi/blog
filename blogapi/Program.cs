@@ -106,13 +106,14 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapGet("/strict/secret", () => "{ \"Error\": \"not implemented yet\"}");
+app.MapGet("/strict/secret", () => Results.Problem("Not implemented yet"));
 
-app.MapGet("/secret", () => "{ \"Error\": \"not implemented yet\"}");
+app.MapGet("/secret", _ => throw new NotImplementedException());
 
 app.MapEndpoints();
 
-app.MapGet("/whoami2", (HttpContext context) => Results.Ok(context.User.Identity?.Name ?? "Anonymous") ).WithName("WhoAmI2").WithOpenApi();
+app.MapGet("/whoami2", (HttpContext context) => 
+    Results.Ok(context.User.Identity?.Name ?? "Anonymous") ).WithName("WhoAmI2").WithOpenApi();
 
 
 app.Run();
