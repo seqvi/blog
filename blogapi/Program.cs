@@ -1,5 +1,8 @@
 using System.Reflection;
+using blogapi.WhoAmI;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -74,6 +77,8 @@ builder.Services.AddHttpLogging(options =>
     
 });
 
+builder.Services.AddServices();
+
 var app = builder.Build();
 
 app.UseHttpLogging();
@@ -101,15 +106,14 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-app.MapGet("/strict/secret", () =>
-{
-    return "No WAY!!!";
-});
+app.MapGet("/strict/secret", () => "{ \"Error\": \"not implemented yet\"}");
 
-app.MapGet("/secret", () =>
-{
-    return "No WAY2!!!";
-});
+app.MapGet("/secret", () => "{ \"Error\": \"not implemented yet\"}");
+
+app.MapEndpoints();
+
+app.MapGet("/whoami2", (HttpContext context) => Results.Ok(context.User.Identity?.Name ?? "Anonymous") ).WithName("WhoAmI2").WithOpenApi();
+
 
 app.Run();
 
